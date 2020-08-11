@@ -20,12 +20,9 @@ az vm create -n "$vmName" --size "$vmSize" --image "$vmImage" --admin-username "
 az configure --default vm="$vmName"
 
 # TODO: capture the VM systemAssignedIdentity
-$vmObjectId="$(az vm show --query "identity.principalId")"
+$vmObjectId = az vm show -n $vmName --query ("identity.principalId")
 
 # TODO: open vm port 443
-# az network nsg rule create --nsg-name "$vmName"-nsg -n inboundWeb --priority 310 --direction Inbound --destination-port-ranges 443
-
-# az network nsg rule create --nsg-name "$vmName"-nsg -n outboundWeb --priority 100 --direction Outbound --destination-port-ranges 443
 az vm open-port --port 443
 
 # provision KV
@@ -46,5 +43,5 @@ az vm run-command invoke --command-id RunShellScript --scripts @deliver-deploy.s
 
 
 # TODO: print VM public IP address to STDOUT or save it as a file
-$publicIp = "$(az vm show -n $vmName -g $rgName --query "publicIpAddress")"
-Write-Output $publicIp
+$vmIP = az vm show -n $vmName -d --query ("publicIps")
+Write-Output "$vmIP"
